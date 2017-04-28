@@ -3,8 +3,10 @@ import Population
 
 zones = []
 
+CURRENT_YEAR = 2015
+
 def setup():
-    divisions = init_divisions()
+    zones = init_divisions()
     potential_client_prob = calculate_potential_client()
     iterate()
 
@@ -19,7 +21,8 @@ def iterate():
 def init_divisions():
     Population.init_death_rates()
     Population.init_birth_rates()
-    Population.init_age_piramid_to(2013);
+    Population.init_age_piramid_to(CURRENT_YEAR);
+    zones_piramids = Population.init_zones_piramid()
 
 
 # NOT IMPLEMENTED: should return a data strcture with the probability that someone will take t minutes to get to the pharmacy

@@ -15,7 +15,7 @@ masculinity_rates = {}
 
 INITIAL_YEAR = 2002
 
-
+# ------------------------------- SECTION read files:
 
 def init_birth_rates():
     with open('data/birth_rate.csv', 'rU') as f:
@@ -36,6 +36,8 @@ def init_masculinity_by_zone():
         reader = csv.DictReader(f)
         for row in reader:
             masculinity_rates[row['zone_id']] = row['masculinity_rate']
+
+# ------------------------------- SECTION rread and generate age piramid:
 
 def init_age_piramid(year):
     with open('data/2002_piramid.csv', 'rU') as f:
@@ -61,40 +63,43 @@ def calculate_total_population():
         TOTAL_POPULATION_OF_PENALOLEN += females[key]
 
 
+
+def survived_year(gender, age):
+    mortality = death_rates[gender][age]
+    survival_rate = (1000 - float(mortality)) / 1000
+
+    return age_piramid[gender][age] * survival_rate
+
+
 def make_piramid_older(piramid, init_year, end_year):
-    make_gender_piramid_older(piramid, 'men', init_year, end_year)
-    make_gender_piramid_older(piramid, 'women', init_year, end_year)
-
-# Missing: population migration
-def make_gender_piramid_older(piramid, gender, init_year, end_year):
-    gender_piramid = piramid[gender]
-    gender_death_rates = death_rates[gender]
+    global age_piramid
+    global CURRENT_YEAR
     for year in range(init_year, end_year):
-        temp = {}
-        for age in range(0,101):
-            #Kill
-            mortality = gender_death_rates[age]
-            survival_rate = (1000 - float(mortality)) / 1000
-            temp[age + 1] = gender_piramid[age] * survival_rate
-        temp[0] = TOTAL_POPULATION_OF_PENALOLEN * (float(birth_rates[str(year)]) / 1000) * 0.5
-        gender_piramid = temp
-    piramid[gender] = gender_piramid
-
+        temp = {'men': {},
+                'women': {}}
+        for age in range(0,100):
+            temp['men'][age + 1] = survived_year('men', age)
+            temp['women'][age + 1] = survived_year('women', age)
+        newborns = TOTAL_POPULATION_OF_PENALOLEN * (float(birth_rates[str(year)]) / 1000)
+        temp['men'][0] = newborns / 2
+        temp['women'][0] = newborns / 2
+        age_piramid = temp
+        calculate_total_population()
 
 
 def init_age_piramid_to(year):
     init_masculinity_by_zone()
     init_age_piramid(year)
 
+
+
 def print_age_piramid():
     print_gender_age_piramid('men')
     print_gender_age_piramid('women')
 
 
-
 def print_gender_age_piramid(gender):
     star_equivalent = 25
-
     print gender
     for age in range(0,101):
         stars_to_print = age_piramid[gender][age] / star_equivalent
