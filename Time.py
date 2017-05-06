@@ -17,6 +17,5 @@ def get_time(zone_id, pharmacy):
 
 
 def check_attr_exists_in_dictionary(attr, dictionary):
-
     if not attr in dictionary:
         dictionary[attr] = {}

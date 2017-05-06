@@ -1,12 +1,76 @@
-from main import ESCENARIO
+from main import SCENARIO, CURRENT_YEAR, END_YEAR
+import Scenario
+import Time
+import csv
 
 
 TIME_TO_PRIVATE_PHARMACY = 11
+%_PRIVATE_PHARMACY = 0.5 #FIXME calculate from poll
+COST_OF_TIME = 1 #FIXME calculate 
 
-demanda_caso_base = read file escenario
 
-demanda = read file escenario
+base_case_demand = get_demand(1);
+scenario_demand =  get_demand(SCENARIO)
+Time.init_travel_time()
 
+
+
+def check_attr_exists_in_dictionary(attr, dictionary):
+    if not attr in dictionary:
+        dictionary[attr] = {}
+
+def get_demand(scenario):
+    demand = {}
+    with open('results/raw/'+ str(scenario) + '.csv', 'rU') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            check_attr_exists_in_dictionary(row['year'], demand)
+            check_attr_exists_in_dictionary(row['zone_id'], demand[row['year']])
+            demand[row['year']][row['zone_id']] = row['total']
+        return demand
+
+
+
+for year in range(CURRENT_YEAR, END_YEAR):
+    for zone_id in demand[year]:
+        print year, zone_id
+            total =  scenario_demand[year][zone_id]
+            base_case_total = scenario_demand[year][zone_id]
+            new_clients = total - base_case_total
+            if( new_clients < 0):
+                print 'should not print this'
+                print total, base_case_total
+                0/0 # Drop script
+            used_to_go_to_private_pharmacy = %_PRIVATE_PHARMACY * new_clients
+            did_not_buy_medicine = (1 - %_PRIVATE_PHARMACY) * new_clients
+            used_to_go_to_comunal_pharmacy = base_case_total
+
+
+def get_time(zone_id):
+    time = 10000000
+    for pharmacy in Scenario.get_pharmacies(SCENARIO):
+        time = min(Time.get_time(zone_id, pharmacy), time)
+
+def get_benefits_from_private_pharmacy( amount):
+
+
+
+def get_benefits_from_no_pharmacy( amount):
+
+def get_benefits_from_comunal_pharmacy(zone_id, amount):
+    time = get_time(zone_id)
+    return time * COST_OF_TIME * amount
+
+
+
+
+
+
+
+
+
+
+# PSEUDO CODIGO:
 for year
     for zones
         total = demanda[year][zones]

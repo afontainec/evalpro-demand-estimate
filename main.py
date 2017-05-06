@@ -11,35 +11,34 @@ global zones
 CURRENT_YEAR = 2017
 END_YEAR = 2037
 
-ESCENARIO  = 2;
+SCENARIO  = 1;
 
 def setup():
     global zones
-    pharmacies = Scenarios.get_pharmacies(ESCENARIO)
+    pharmacies = Scenarios.get_pharmacies(SCENARIO)
     init_probabilites()
-    for pharmacy in pharmacies:
-        zones = init_divisions()
-        iterate(pharmacy)
+    zones = init_divisions()
+    iterate()
 
 
 
 
-def get_served_market_by_gender(gender, zone_id, pharmacy, piramid, month):
+def get_served_market_by_gender(gender, zone_id, piramid, month):
     gender_piramid = piramid[gender]
     served_piramid = {}
     for age in range(0,101):
         # served_piramid[age] = gender_piramid[age] * probability_will_go(gender, age, zone_id, month)
-        served_piramid[age] = gender_piramid[age] * calculate_probability_will_go(month, gender, zone_id, age, pharmacy)
+        served_piramid[age] = gender_piramid[age] * calculate_probability_will_go(month, gender, zone_id, age, SCENARIO)
     return served_piramid
 
 
-def get_served_market(zone_id, pharmacy, piramid, month):
+def get_served_market(zone_id, piramid, month):
     served_market = {
         "men": {},
         "women": {}
         }
-    served_market['men'] = get_served_market_by_gender('men', zone_id, pharmacy, piramid, month)
-    served_market['women'] = get_served_market_by_gender('women', zone_id, pharmacy, piramid, month)
+    served_market['men'] = get_served_market_by_gender('men', zone_id, piramid, month)
+    served_market['women'] = get_served_market_by_gender('women', zone_id, piramid, month)
     return served_market
 
 def init_year_served_market():
@@ -48,9 +47,8 @@ def init_year_served_market():
         served_market[month] = {}
     return served_market
 
-def iterate(pharmacy):
-    global s
-    print 'Getting demand of pharmacy: ', pharmacy
+def iterate():
+    print 'Running scenario: ', SCENARIO
     global zones
     served_market = {}
     for year in range(CURRENT_YEAR, END_YEAR):
@@ -60,10 +58,9 @@ def iterate(pharmacy):
             zones[zone_id] = Population.make_piramid_older(zones[zone_id], year - 1, year)
             for month in range(0,12):
                 passed_months = month + (year - CURRENT_YEAR) * 12 + 1
-                served_market[year][month][zone_id] = get_served_market(zone_id, pharmacy, zones[zone_id], passed_months)
+                served_market[year][month][zone_id] = get_served_market(zone_id, zones[zone_id], passed_months)
     # print_served_market(zones, served_market)
-    print_summarry(zones, served_market, pharmacy)
-    s[pharmacy] = served_market
+    print_summarry(zones, served_market)
 
 
 def init_divisions():
@@ -75,8 +72,8 @@ def init_divisions():
 
 
 
-def print_summarry(zones, served_market, pharmacy):
-    f = open('./results/raw/' + pharmacy + '.csv', 'w')
+def print_summarry(zones, served_market):
+    f = open('./results/raw/' + str(SCENARIO) + '.csv', 'w')
     heading = "year"  + "," + "zone_id"  + "," + "total"
     f.write(heading)
     f.write('\n')

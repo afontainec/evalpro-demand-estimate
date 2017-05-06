@@ -44,11 +44,10 @@ string_all_ranges = ['[0, 9]',
 # _zones_san_luis = {25:41, 28:40, 24:42, 22:43, }
 _zones_san_luis ={23:43, 25:42, 28:43, 24:43, 22:43, 20:6}
 
-def calculate_probability_will_go(month, gender, zone_id, age, scenario = 'Municipalidad'):
+def calculate_probability_will_go(month, gender, zone_id, age, scenario = 1):
     _zone_id = zone_id
 
-    if scenario == 'San_Luis' and int(zone_id) in _zones_san_luis:
-        print 'entro'
+    if scenario == 2 and int(zone_id) in _zones_san_luis:
         _zone_id = _zones_san_luis[int(zone_id)]
 
     _range = string_all_ranges[select_range(age, _all_ranges)]
