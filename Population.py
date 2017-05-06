@@ -87,11 +87,11 @@ def read_zones_age_range():
             masculinity_rate_of_z = float(masculinity_rates[z_id])
             portion_of_men = masculinity_rate_of_z / (masculinity_rate_of_z + 100)
             portion_of_women = 1 - portion_of_men
-            generate_age_piramid_for_range(z,0, 15, int(row['0-14']), portion_of_men)
-            generate_age_piramid_for_range(z,15, 30, int(row['15-29']), portion_of_men)
-            generate_age_piramid_for_range(z,30, 60, int(row['30-59']), portion_of_men)
-            generate_age_piramid_for_range(z,60, 101, int(row['60-100']), portion_of_men)
-            total += int(row['0-14']) + int(row['15-29']) + int(row['30-59']) + int(row['60-100'])
+            generate_age_piramid_for_range(z,0, 15, float(row['0-14']), portion_of_men)
+            generate_age_piramid_for_range(z,15, 30, float(row['15-29']), portion_of_men)
+            generate_age_piramid_for_range(z,30, 60, float(row['30-59']), portion_of_men)
+            generate_age_piramid_for_range(z,60, 101, float(row['60-100']), portion_of_men)
+            total += float(row['0-14']) + float(row['15-29']) + float(row['30-59']) + float(row['60-100'])
             zones[z_id] = z
     return {'zones':zones,
             'total': total
