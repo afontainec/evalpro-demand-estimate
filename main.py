@@ -9,7 +9,7 @@ global zones
 CURRENT_YEAR = 2017
 END_YEAR = 2037
 
-ESCENARIO  = 4;
+ESCENARIO  = 2;
 
 def setup():
     global zones
@@ -20,22 +20,22 @@ def setup():
         iterate(pharmacy)
 
 
-def get_served_market_by_gender(gender, travel_time, piramid, year):
+def get_served_market_by_gender(gender, zone_id, pharmacy, piramid, month):
     gender_piramid = piramid[gender]
     served_piramid = {}
     for age in range(0,101):
-        # served_piramid[age] = gender_piramid[age] * probability_will_go(gender, age, travel_time, year)
-        served_piramid[age] = gender_piramid[age] * ProbabilityCalculator.calculate_probability_will_go(year, gender, age, zone_id, pharmacy)
+        served_piramid[age] = gender_piramid[age] * probability_will_go(gender, age, zone_id, month)
+        gender_piramid[age] * ProbabilityCalculator.calculate_probability_will_go(month, gender, age, zone_id, pharmacy)
     return served_piramid
 
 
-def get_served_market(travel_time, piramid, year):
+def get_served_market(zone_id, pharmacy, piramid, month):
     served_market = {
         "men": {},
         "women": {}
         }
-    served_market['men'] = get_served_market_by_gender('men', travel_time, piramid, year)
-    served_market['women'] = get_served_market_by_gender('women', travel_time, piramid, year)
+    served_market['men'] = get_served_market_by_gender('men', zone_id, pharmacy, piramid, month)
+    served_market['women'] = get_served_market_by_gender('women', zone_id, pharmacy, piramid, month)
     return served_market
 
 def init_year_served_market():
@@ -54,7 +54,8 @@ def iterate(pharmacy):
         for zone_id in zones:
             zones[zone_id] = Population.make_piramid_older(zones[zone_id], year - 1, year)
             for month in range(0,12):
-                served_market[year][month][zone_id] = get_served_market(Time.get_time(zone_id, pharmacy), zones[zone_id], year)
+                passed_months = month + (year - CURRENT_YEAR) * 12
+                served_market[year][month][zone_id] = get_served_market(zone_id, pharmacy, zones[zone_id], passed_months)
     # print_served_market(zones, served_market)
     print_summarry(zones, served_market, pharmacy)
 
