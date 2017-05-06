@@ -1,8 +1,10 @@
 import area
 import Population
 import Time
-import ProbabilityCalculator
-import Escenarios
+from ProbabilityCalculator import calculate_probability_will_go, init_probabilites
+import Scenarios
+
+s = {}
 
 
 global zones
@@ -13,19 +15,21 @@ ESCENARIO  = 2;
 
 def setup():
     global zones
-    zones = init_divisions()
-    pharmacies = Escenarios.get_pharmacies(ESCENARIO)
-    ProbabilityCalculator.init_probabilites(pharmacies)
+    pharmacies = Scenarios.get_pharmacies(ESCENARIO)
+    init_probabilites()
     for pharmacy in pharmacies:
+        zones = init_divisions()
         iterate(pharmacy)
+
+
 
 
 def get_served_market_by_gender(gender, zone_id, pharmacy, piramid, month):
     gender_piramid = piramid[gender]
     served_piramid = {}
     for age in range(0,101):
-        served_piramid[age] = gender_piramid[age] * probability_will_go(gender, age, zone_id, month)
-        gender_piramid[age] * ProbabilityCalculator.calculate_probability_will_go(month, gender, age, zone_id, pharmacy)
+        # served_piramid[age] = gender_piramid[age] * probability_will_go(gender, age, zone_id, month)
+        served_piramid[age] = gender_piramid[age] * calculate_probability_will_go(month, gender, zone_id, age, pharmacy)
     return served_piramid
 
 
@@ -45,6 +49,7 @@ def init_year_served_market():
     return served_market
 
 def iterate(pharmacy):
+    global s
     print 'Getting demand of pharmacy: ', pharmacy
     global zones
     served_market = {}
@@ -54,10 +59,11 @@ def iterate(pharmacy):
         for zone_id in zones:
             zones[zone_id] = Population.make_piramid_older(zones[zone_id], year - 1, year)
             for month in range(0,12):
-                passed_months = month + (year - CURRENT_YEAR) * 12
+                passed_months = month + (year - CURRENT_YEAR) * 12 + 1
                 served_market[year][month][zone_id] = get_served_market(zone_id, pharmacy, zones[zone_id], passed_months)
     # print_served_market(zones, served_market)
     print_summarry(zones, served_market, pharmacy)
+    s[pharmacy] = served_market
 
 
 def init_divisions():
@@ -67,11 +73,6 @@ def init_divisions():
     Population.init_age_piramid_to(CURRENT_YEAR);
     return Population.init_zones_piramid()
 
-
-
-# FIXME: should return a data strcture with the probability that someone will take t minutes to get to the pharmacy
-def probability_will_go(gender, age, zone_id, year):
-    return 0.5
 
 
 def print_summarry(zones, served_market, pharmacy):

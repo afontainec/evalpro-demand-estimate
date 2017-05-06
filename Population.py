@@ -110,7 +110,6 @@ def get_piramid_by_zone(zones, density):
 def init_zones_piramid():
     data = read_zones_age_range()
     total_pixels = data['total']
-    # FIXME
     pixel_population_density = TOTAL_POPULATION_OF_PENALOLEN / total_pixels
     get_piramid_by_zone(data['zones'], pixel_population_density)
     return data['zones']

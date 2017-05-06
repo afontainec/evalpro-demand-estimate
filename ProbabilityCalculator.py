@@ -4,68 +4,6 @@ import numpy as np
 
 probability_will_go = {}
 
-max_interval = [15, 25, 40,60, 1000]
-
-
-
-
-
-def init_probabilites(pharmacies):
-    global probability_will_go
-    probability_will_go = pd.read_csv('data_probabilities').set_index(['sexo','unidad','rango'])
-
-
-
-
-# def probabilities(pharmacy):
-#     global probability_will_go
-#     probability_will_go[pharmacy] = {}
-#     with open('data/probability_will_go_' + pharmacy + '.csv', 'rU') as f:
-#         reader = csv.DictReader(f)
-#         for row in reader:
-#             check_attr_exists_in_dictionary(row['year'], probability_will_go[pharmacy])
-#             check_attr_exists_in_dictionary(row['gender'], probability_will_go[pharmacy][row['year']])
-#             for age in range(int(row['min_age']), int(row['max_age']) + 1):
-#                 check_attr_exists_in_dictionary(age, probability_will_go[pharmacy][row['year']][row['gender']])
-#                 probability_will_go[pharmacy][row['year']][row['gender']][age][max_interval[0]] = row['between_0_and_15']
-#                 probability_will_go[pharmacy][row['year']][row['gender']][age][max_interval[1]] = row['between_15_and_25']
-#                 probability_will_go[pharmacy][row['year']][row['gender']][age][max_interval[2]] = row['between_25_and_40']
-#                 probability_will_go[pharmacy][row['year']][row['gender']][age][max_interval[3]] = row['between_40_and_60']
-#                 probability_will_go[pharmacy][row['year']][row['gender']][age][max_interval[4]] = row['between_60_and_1000']
-
-
-
-def check_attr_exists_in_dictionary(attr, dictionary):
-    if not attr in dictionary:
-        dictionary[attr] = {}
-
-
-def get_time_key(minutes):
-    global max_interval
-    max_interval = sorted(max_interval)
-    for value in max_interval:
-        if( minutes < value):
-            return value
-
-
-def calculate_probability_will_go(month, gender, age, zone_id, pharmacy):
-    return 0.5
-
-
-
-
-# coding: utf-8
-
-# In[1]:
-
-
-
-
-# In[2]:
-
-
-
-# In[2]:
 
 _all_ranges = np.array([
                 np.arange(0, 9+1),
@@ -76,9 +14,20 @@ _all_ranges = np.array([
                np.arange(80, 200+1)
               ])
 
+
+
+
+
+def init_probabilites(pharmacies = None):
+    global probability_will_go
+    probability_will_go = pd.read_csv('./data/data_probabilities').set_index(['sexo','unidad','rango'])
+
+
+
 def select_range(x, r):
+
     for i, _ in enumerate(r):
-        if x in _:
+        if int(x) in _:
             return i
     return i
 
@@ -91,29 +40,31 @@ string_all_ranges = ['[0, 9]',
               ]
 
 
-# In[5]:
 
-_unidades_san_luis = {25:41, 28:40, 24:42, 22:43}
+# _zones_san_luis = {25:41, 28:40, 24:42, 22:43, }
+_zones_san_luis ={23:43, 25:42, 28:43, 24:43, 22:43, 20:6}
 
-def prob(meses_desde_apertura, sexo, unidad, edad, farmacia = 'Municipalidad'):
-    _unidad = unidad
+def calculate_probability_will_go(month, gender, zone_id, age, scenario = 'Municipalidad'):
+    _zone_id = zone_id
 
-    if farmacia == 'San_Luis' and unidad in _unidades:
-        _unidad = _unidades_san_luis[unidad]
+    if scenario == 'San_Luis' and int(zone_id) in _zones_san_luis:
+        print 'entro'
+        _zone_id = _zones_san_luis[int(zone_id)]
 
-    _range = string_all_ranges[select_range(edad, _all_ranges)]
-    ponderador, a, b, c, d, prob, tiempo =  data_ponderadores.loc[(sexo,int(_unidad),_range)]
+    _range = string_all_ranges[select_range(age, _all_ranges)]
+
+    if not (gender,int(_zone_id),_range) in probability_will_go.index:
+        return 0.000774
+
+    old_index, ponderador, a, b, c, d, prob, tiempo =  probability_will_go.loc[(gender,int(_zone_id),_range)]
 
     div = 972
-    _nx = meses_desde_apertura
+    _nx = month
     _ret = (a*_nx + b*_nx**2 + c*np.log(_nx)/np.log(d))/div
 
+    if _ret == -1 *np.infty:
+        print ' fin calcular p', _ret, _nx, np.log(_nx), a, b, c, d, np.log(d), div
+        print 'QUEDDOOOO LLA PATADAAA\n\n\n\n\n\n\n\n\n\n\n'
+        0/0
+
     return _ret
-
-
-# In[6]:
-
-prob(40, 'masculino', 25, 50, 'san_luis')
-
-
-# In[ ]:
