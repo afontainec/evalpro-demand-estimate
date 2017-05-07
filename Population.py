@@ -119,6 +119,8 @@ def init_zones_piramid():
 
 def init_age_piramid(year):
     global age_piramid
+    global TOTAL_POPULATION_OF_PENALOLEN
+
     with open('data/2015_piramid.csv', 'rU') as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -128,19 +130,19 @@ def init_age_piramid(year):
             for age in range(range_min, range_max + 1):
                 age_piramid['men'][age] = int(row['men']) / diff
                 age_piramid['women'][age] = int(row['women']) / diff
-    calculate_total_population()
+    TOTAL_POPULATION_OF_PENALOLEN = calculate_total_population(age_piramid)
     age_piramid = make_piramid_older(age_piramid,INITIAL_YEAR, year)
 
 
-def calculate_total_population():
-    global TOTAL_POPULATION_OF_PENALOLEN
-    TOTAL_POPULATION_OF_PENALOLEN = 0
-    males = age_piramid['men']
-    females = age_piramid['women']
+def calculate_total_population(piramid):
+    total = 0
+    males = piramid['men']
+    females = piramid['women']
     for key in males:
-        TOTAL_POPULATION_OF_PENALOLEN += males[key]
+        total += males[key]
     for key in females:
-        TOTAL_POPULATION_OF_PENALOLEN += females[key]
+        total += females[key]
+    return total
 
 
 def survived_year(gender, age, piramid):

@@ -18,6 +18,7 @@ def setup():
     pharmacies = Scenarios.get_pharmacies(SCENARIO)
     init_probabilites()
     zones = init_divisions()
+    print Population.TOTAL_POPULATION_OF_PENALOLEN, 'inicial'
     iterate()
 
 
@@ -53,12 +54,15 @@ def iterate():
     served_market = {}
     for year in range(CURRENT_YEAR, END_YEAR):
         print('calculating year', year, '...')
+        total_population_in_year = 0
         served_market[year] = init_year_served_market()
         for zone_id in zones:
             zones[zone_id] = Population.make_piramid_older(zones[zone_id], year - 1, year)
+            total_population_in_year += Population.calculate_total_population(zones[zone_id])
             for month in range(0,12):
                 passed_months = month + (year - CURRENT_YEAR) * 12 + 1
                 served_market[year][month][zone_id] = get_served_market(zone_id, zones[zone_id], passed_months)
+        print 'population in', year, total_population_in_year
     # print_served_market(zones, served_market)
     print_summarry(zones, served_market)
 
