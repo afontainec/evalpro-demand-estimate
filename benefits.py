@@ -4,7 +4,7 @@ import Time
 import csv
 CURRENT_YEAR = 2017
 END_YEAR = 2037
-SCENARIO = 1
+SCENARIO = 2
 
 PORCENTAGE_PRIVATE_PHARMACY = 0.953
 COST_OF_TIME = 1688/60
@@ -82,24 +82,22 @@ yearly_costs = {}
 
 
 def get_new_clients(year,zone,age,gender,SCENARIO):
+    base_case_total_last_year = 0
+    base_case_total_now = float(base_case_demand[year][zone_id][str(age)][gender])
+    if(int(year) != CURRENT_YEAR):
+        base_case_total_last_year = float(base_case_demand[str(int(year) - 1)][zone_id][str(age)][gender])
     if(SCENARIO == 1):
-        base_case_total_last_year = 0
-        base_case_total_now = float(base_case_demand[year][zone_id][str(age)][gender])
-        if(int(year) != CURRENT_YEAR):
-            base_case_total_last_year = float(base_case_demand[str(int(year) - 1)][zone_id][str(age)][gender])
         return max(base_case_total_now - base_case_total_last_year, 0)
     else:
         total =  scenario_demand[year][zone_id][str(age)][gender]
         base_case_total = base_case_demand[year][zone_id][str(age)][gender]
-        return float(total) - float(base_case_total)
+        return max(float(total) -  float(base_case_total_last_year), 0)
 
 def get_used_to_go_to_comunal_pharmacy(year,zone,age,gender,SCENARIO, new_clients):
-    base_case_total = base_case_demand[year][zone_id][str(age)][gender]
-    if (SCENARIO == 1):
-        return float(base_case_total) - new_clients
-    else:
-        return float(base_case_total)
+    total = scenario_demand[year][zone_id][str(age)][gender]
+    return float(total) - new_clients
 
+print 'BENEFITS FOR SCENARIO', str(SCENARIO)
 for year in range(CURRENT_YEAR, END_YEAR):
     print 'calculating benefits and costs of ', year
     benefits = 0
