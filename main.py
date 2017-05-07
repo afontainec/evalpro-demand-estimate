@@ -48,11 +48,11 @@ def init_year_served_market():
     return served_market
 
 def iterate():
-    print 'Running scenario: ', SCENARIO
+    print('Running scenario: ', SCENARIO)
     global zones
     served_market = {}
     for year in range(CURRENT_YEAR, END_YEAR):
-        print 'calculating year', year, '...'
+        print('calculating year', year, '...')
         served_market[year] = init_year_served_market()
         for zone_id in zones:
             zones[zone_id] = Population.make_piramid_older(zones[zone_id], year - 1, year)
@@ -82,10 +82,15 @@ def print_summarry(zones, served_market):
             total_of_zone = 0
             for month in range(0,12):
                 for age in range(0, 101):
-                    total_of_zone += served_market[year][month][zone_id]['men'][age] + served_market[year][month][zone_id]['women'][age]
-            line =  str(year)  + "," + str(zone_id)  + "," + str(total_of_zone)
-            f.write(line)
-            f.write('\n')
+                    #total_of_zone += served_market[year][month][zone_id]['men'][age] + served_market[year][month][zone_id]['women'][age]
+                    #line =  str(year)  + "," + str(zone_id)  + "," + str(total_of_zone)
+                    line = str(year) + "," + str(age) + "," + 'men' + ',' + str(served_market[year][month][zone_id]['men'][age])
+                    f.write(line)
+                    f.write('\n')
+                    line = str(year) + "," + str(age) + "," + 'women' + ',' + str(served_market[year][month][zone_id]['women'][age])
+                    f.write(line)
+                    f.write('\n')
+
     f.close()
 
 
@@ -93,13 +98,13 @@ def print_summarry(zones, served_market):
 
 def print_served_market(zones, served_market):
     for year in range(CURRENT_YEAR, END_YEAR):
-        print '************************************', year, '************************************'
+        print('************************************', year, '************************************')
         for zone_id in zones:
-            print '----------------- Zona', zone_id, ':'
+            print('----------------- Zona', zone_id, ':')
             for month in range(0,12):
-                print "Mes", month
+                print("Mes", month)
                 for age in range(0, 101):
-                    print "Hombres de ", age, " anos: ",served_market[year][month][zone_id]['men'][age]
-                    print "Mujeres de ", age, " anos: ",served_market[year][month][zone_id]['women'][age]
+                    print("Hombres de ", age, " anos: ",served_market[year][month][zone_id]['men'][age])
+                    print("Mujeres de ", age, " anos: ",served_market[year][month][zone_id]['women'][age])
 
 setup()
