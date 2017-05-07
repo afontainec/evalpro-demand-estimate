@@ -6,8 +6,14 @@ CURRENT_YEAR = 2017
 END_YEAR = 2037
 SCENARIO = 2
 
+SENSIBILITY = 'TIME'
+LIFE_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to LIFE this should be 1
+TIME_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to TIME this should be 1
+SAVINGS_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to SAVINGS this should be 1
+
+
 PORCENTAGE_PRIVATE_PHARMACY = 0.953
-COST_OF_TIME = 1688/60
+COST_OF_TIME = 1688/60 * TIME_SENSIBILITY_FACTOR
 VALUE_OF_GOOD_LIFE = {} #FIXME calculate
 
 AVERAGE_SPENDING_PRIVATE_PHARMACY = {}
@@ -21,7 +27,8 @@ with open('data/value_of_good_life.csv', 'rU') as f:
     reader = csv.DictReader(f)
     for row in reader:
         for age in range(int(row['range_min']), int(row['range_max']) + 1):
-            VALUE_OF_GOOD_LIFE[age] = float(row['value'])
+
+            VALUE_OF_GOOD_LIFE[age] = float(row['value']) * LIFE_SENSIBILITY_FACTOR
 
 with open('data/average_basket_cost.csv', 'rU') as f:
     reader = csv.DictReader(f)
@@ -59,7 +66,7 @@ def get_time(zone_id):
 def get_benefits_and_costs_from_private_pharmacy(zone_id, age, gender, amount):
     time = get_time(zone_id)
     delta_time = float(Time.get_time(zone_id, 'Private')) - float(time)
-    saving = float(AVERAGE_SPENDING_PRIVATE_PHARMACY[gender][age]) - float(AVERAGE_SPENDING_COMUNAL_PHARMACY[gender][age])
+    saving = (float(AVERAGE_SPENDING_PRIVATE_PHARMACY[gender][age]) - float(AVERAGE_SPENDING_COMUNAL_PHARMACY[gender][age])) * SAVINGS_SENSIBILITY_FACTOR
     return [(saving + delta_time * COST_OF_TIME) * amount, 0]
 
 
@@ -92,6 +99,7 @@ def get_new_clients(year,zone,age,gender,SCENARIO):
         total =  scenario_demand[year][zone_id][str(age)][gender]
         base_case_total = base_case_demand[year][zone_id][str(age)][gender]
         return max(float(total) -  float(base_case_total_last_year), 0)
+
 
 def get_used_to_go_to_comunal_pharmacy(year,zone,age,gender,SCENARIO, new_clients):
     total = scenario_demand[year][zone_id][str(age)][gender]
@@ -130,7 +138,17 @@ for year in range(CURRENT_YEAR, END_YEAR):
     yearly_costs[str(year)] = costs
 
 
-f = open('./results/benefits/' + str(SCENARIO) + '.csv', 'w')
+file_to_save = ''
+if SENSIBILITY is None:
+    file_to_save = './results/benefits/' + str(SCENARIO) + '.csv'
+elif SENSIBILITY == 'LIFE':
+    file_to_save = './results/sensibility/value_of_life/scenario_' + str(SCENARIO) + '_factor_' + str(LIFE_SENSIBILITY_FACTOR) + '.csv'
+elif SENSIBILITY == 'TIME':
+    file_to_save = './results/sensibility/cost_of_time/scenario_' + str(SCENARIO) + '_factor_' + str(TIME_SENSIBILITY_FACTOR) + '.csv'
+elif SENSIBILITY == 'SAVINGS':
+    file_to_save = './results/sensibility/savings/scenario_' + str(SCENARIO) + '_factor_' + str(SAVINGS_SENSIBILITY_FACTOR) + '.csv'
+
+f = open(file_to_save, 'w')
 line = 'year,benefit,cost\n'
 f.write(line)
 for year in range(CURRENT_YEAR, END_YEAR):
