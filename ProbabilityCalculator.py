@@ -57,7 +57,7 @@ def calculate_probability_will_go(month, gender, zone_id, age, scenario = 1):
 
     old_index, ponderador, a, b, c, d, prob, tiempo =  probability_will_go.loc[(gender,int(_zone_id),_range)]
 
-    div = 972
+    div = 972/1.5
     _nx = month
     _ret = (a*_nx + b*_nx**2 + c*np.log(_nx)/np.log(d))/div
 

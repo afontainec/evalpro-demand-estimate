@@ -74,23 +74,19 @@ def init_divisions():
 
 def print_summarry(zones, served_market):
     f = open('./results/raw/' + str(SCENARIO) + '.csv', 'w')
-    heading = "year"  + "," + "zone_id"  + "," + "total"
+    heading = "year"  + "," + "zone_id" + ","  + "age" + ","  + "gender" + "," + "total"
     f.write(heading)
     f.write('\n')
     for year in range(CURRENT_YEAR, END_YEAR):
         for zone_id in zones:
-            total_of_zone = 0
-            for month in range(0,12):
                 for age in range(0, 101):
-                    #total_of_zone += served_market[year][month][zone_id]['men'][age] + served_market[year][month][zone_id]['women'][age]
-                    #line =  str(year)  + "," + str(zone_id)  + "," + str(total_of_zone)
-                    line = str(year) + "," + str(age) + "," + 'men' + ',' + str(served_market[year][month][zone_id]['men'][age])
-                    f.write(line)
-                    f.write('\n')
-                    line = str(year) + "," + str(age) + "," + 'women' + ',' + str(served_market[year][month][zone_id]['women'][age])
-                    f.write(line)
-                    f.write('\n')
-
+                    for gender in ['men', 'women']:
+                        total_of_year = 0
+                        for month in range(0,12):
+                            total_of_year += served_market[year][month][zone_id][gender][age]
+                        line = str(year) + "," + str(zone_id) + "," + str(age) + "," + gender + ',' + str(total_of_year)
+                        f.write(line)
+                        f.write('\n')
     f.close()
 
 
