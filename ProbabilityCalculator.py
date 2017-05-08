@@ -42,13 +42,16 @@ string_all_ranges = ['[0, 9]',
 
 
 # _zones_san_luis = {25:41, 28:40, 24:42, 22:43, }
-_zones_san_luis ={23:43, 25:42, 28:43, 24:43, 22:43, 20:6}
+_zones_san_luis = {23:43, 25:42, 28:43, 24:43, 22:43, 20:6}
+_zones_lo_hermida = {18:43, 17:42, 19:6, 16:6}
 
 def calculate_probability_will_go(month, gender, zone_id, age, scenario = 1):
     _zone_id = zone_id
 
     if scenario == 2 and int(zone_id) in _zones_san_luis:
         _zone_id = _zones_san_luis[int(zone_id)]
+    if scenario == 3 and int(zone_id) in _zones_lo_hermida:
+        _zone_id = _zones_lo_hermida[int(zone_id)]
 
     _range = string_all_ranges[select_range(age, _all_ranges)]
 

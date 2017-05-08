@@ -4,9 +4,9 @@ import Time
 import csv
 CURRENT_YEAR = 2017
 END_YEAR = 2037
-SCENARIO = 2
+SCENARIO = 3
 
-SENSIBILITY = 'TIME'
+SENSIBILITY = None
 LIFE_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to LIFE this should be 1
 TIME_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to TIME this should be 1
 SAVINGS_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to SAVINGS this should be 1

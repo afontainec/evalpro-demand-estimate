@@ -11,7 +11,7 @@ global zones
 CURRENT_YEAR = 2017
 END_YEAR = 2037
 
-SCENARIO  = 1;
+SCENARIO  = 3;
 
 def setup():
     global zones
