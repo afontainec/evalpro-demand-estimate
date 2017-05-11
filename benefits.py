@@ -4,17 +4,18 @@ import Time
 import csv
 CURRENT_YEAR = 2017
 END_YEAR = 2037
-SCENARIO = 3
+SCENARIO = 2
 
-SENSIBILITY = None
-LIFE_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to LIFE this should be 1
+SENSIBILITY = 'LIFE'
+LIFE_SENSIBILITY_FACTOR = 0 # if SENSIBILITY is distinct to LIFE this should be 1
 TIME_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to TIME this should be 1
 SAVINGS_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to SAVINGS this should be 1
+DEMAND_SENSIBILITY_FACTOR = 1 # if SENSIBILITY is distinct to SAVINGS this should be 1 FIXME This should be done different, because of the cuota.
 
 
 PORCENTAGE_PRIVATE_PHARMACY = 0.953
 COST_OF_TIME = 1688/60 * TIME_SENSIBILITY_FACTOR
-VALUE_OF_GOOD_LIFE = {} #FIXME calculate
+VALUE_OF_GOOD_LIFE = {}
 
 AVERAGE_SPENDING_PRIVATE_PHARMACY = {}
 AVERAGE_SPENDING_COMUNAL_PHARMACY = {}
@@ -54,7 +55,7 @@ def get_demand(scenario):
             check_attr_exists_in_dictionary(row['zone_id'], demand[row['year']])
             check_attr_exists_in_dictionary(row['age'], demand[row['year']][row['zone_id']])
             check_attr_exists_in_dictionary(row['gender'], demand[row['year']][row['zone_id']][row['age']])
-            demand[row['year']][row['zone_id']][row['age']][row['gender']] = row['total']
+            demand[row['year']][row['zone_id']][row['age']][row['gender']] = float(row['new_total']) * DEMAND_SENSIBILITY_FACTOR
         return demand
 
 def get_time(zone_id):
@@ -76,7 +77,7 @@ def get_benefits_and_costs_from_no_pharmacy(zone_id, age, gender, amount):
     return [amount * VALUE_OF_GOOD_LIFE[age] / 12, amount * (spending + time * COST_OF_TIME)]
 
 def get_benefits_and_costs_from_comunal_pharmacy(zone_id, amount):
-    time = get_time(zone_id)
+    time = Time.get_time(zone_id, 'Municipalidad') - get_time(zone_id)
     return [time * COST_OF_TIME * amount, 0]
 
 
@@ -89,23 +90,19 @@ yearly_costs = {}
 
 
 def get_new_clients(year,zone,age,gender,SCENARIO):
-    base_case_total_last_year = 0
-    base_case_total_now = float(base_case_demand[year][zone_id][str(age)][gender])
-    if(int(year) != CURRENT_YEAR):
-        base_case_total_last_year = float(base_case_demand[str(int(year) - 1)][zone_id][str(age)][gender])
-    if(SCENARIO == 1):
-        return max(base_case_total_now - base_case_total_last_year, 0)
-    else:
-        total =  scenario_demand[year][zone_id][str(age)][gender]
-        base_case_total = base_case_demand[year][zone_id][str(age)][gender]
-        return max(float(total) -  float(base_case_total_last_year), 0)
+    if (SCENARIO == 1):
+        return float(base_case_demand[year][zone_id][str(age)][gender])
+    return max(float(scenario_demand[year][zone_id][str(age)][gender]) - float(base_case_demand[year][zone_id][str(age)][gender]), 0) #FIXME: The max should not be needed
 
 
 def get_used_to_go_to_comunal_pharmacy(year,zone,age,gender,SCENARIO, new_clients):
-    total = scenario_demand[year][zone_id][str(age)][gender]
-    return float(total) - new_clients
+    if (SCENARIO == 1):
+        return 0
+    return float(base_case_demand[year][zone_id][str(age)][gender])
 
 print 'BENEFITS FOR SCENARIO', str(SCENARIO)
+print 'SENSIBILITY', SENSIBILITY
+
 for year in range(CURRENT_YEAR, END_YEAR):
     print 'calculating benefits and costs of ', year
     benefits = 0
@@ -114,9 +111,6 @@ for year in range(CURRENT_YEAR, END_YEAR):
     for zone_id in scenario_demand[year]:
         for age in range(0,101):
             for gender in ['men', 'women']:
-                # total =  scenario_demand[year][zone_id][str(age)][gender]
-                # base_case_total = base_case_demand[year][zone_id][str(age)][gender]
-                # new_clients = float(total) - float(base_case_total)
                 new_clients = get_new_clients(year, zone_id, age, gender, SCENARIO)
                 if( new_clients < 0):
                     print 'should not print this'
@@ -147,6 +141,8 @@ elif SENSIBILITY == 'TIME':
     file_to_save = './results/sensibility/cost_of_time/scenario_' + str(SCENARIO) + '_factor_' + str(TIME_SENSIBILITY_FACTOR) + '.csv'
 elif SENSIBILITY == 'SAVINGS':
     file_to_save = './results/sensibility/savings/scenario_' + str(SCENARIO) + '_factor_' + str(SAVINGS_SENSIBILITY_FACTOR) + '.csv'
+elif SENSIBILITY == 'DEMAND':
+    file_to_save = './results/sensibility/demand/scenario_' + str(SCENARIO) + '_factor_' + str(DEMAND_SENSIBILITY_FACTOR) + '.csv'
 
 f = open(file_to_save, 'w')
 line = 'year,benefit,cost\n'

@@ -1,6 +1,8 @@
 
 
-pharmacies = {1: ['Municipalidad'],
+pharmacies = {
+              0: ['Municipalidad'],  #EXTENDED
+              1: ['Municipalidad'],
               2: ['Municipalidad', 'San_Luis'],
               3: ['Municipalidad', 'Lo_Hermida'],
               4: ['Municipalidad', 'Lo_Hermida', 'San_Luis']}

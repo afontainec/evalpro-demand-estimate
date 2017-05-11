@@ -1,19 +1,20 @@
 import csv
+from Global import INITIAL_YEAR, FINAL_YEAR
 
 death_rates = { 'men': {},
                 'women': {},
                 }
 fertility_rates = {}
 
-age_piramid = { 'men': {},
-                'women': {},
-                }
+penalolen_age_pyramid = { 'men': {},
+                        'women': {},
+                        }
 
-TOTAL_POPULATION_OF_PENALOLEN = 10; #needed to get the amount of newborns
+TOTAL_POPULATION_OF_PENALOLEN = 0;
 
 masculinity_rates = {}
 
-INITIAL_YEAR = 2015
+AGE_PIRAMID_YEAR = 2015
 
 # ------------------------------- SECTION read files:
 
@@ -53,6 +54,8 @@ def init_masculinity_by_zone():
         for row in reader:
             masculinity_rates[row['zone_id']] = row['masculinity_rate']
 
+
+
 # -------------------------- SECTION read zones age and sex population
 
 
@@ -60,13 +63,13 @@ def ponderate_population(age, gender, age_range, total, portion_of_gender):
     amount_of_gender = portion_of_gender * total
     count = 0
     for i in age_range:
-        count += age_piramid[gender][i]
-    count_of_age = age_piramid[gender][age]
+        count += age_pyramid[gender][i]
+    count_of_age = age_pyramid[gender][age]
     portion_of_age = count_of_age / count
     return amount_of_gender * portion_of_age
 
 
-def generate_age_piramid_for_range(z,min_v, max_v, total_in_range, portion_of_men):
+def generate_age_pyramid_for_range(z,min_v, max_v, total_in_range, portion_of_men):
     portion_of_women = 1 - portion_of_men
     range_v = range(min_v, max_v)
     total = 0
@@ -87,17 +90,17 @@ def read_zones_age_range():
             masculinity_rate_of_z = float(masculinity_rates[z_id])
             portion_of_men = masculinity_rate_of_z / (masculinity_rate_of_z + 100)
             portion_of_women = 1 - portion_of_men
-            generate_age_piramid_for_range(z,0, 15, float(row['0-14']), portion_of_men)
-            generate_age_piramid_for_range(z,15, 30, float(row['15-29']), portion_of_men)
-            generate_age_piramid_for_range(z,30, 60, float(row['30-59']), portion_of_men)
-            generate_age_piramid_for_range(z,60, 101, float(row['60-100']), portion_of_men)
+            generate_age_pyramid_for_range(z,0, 15, float(row['0-14']), portion_of_men)
+            generate_age_pyramid_for_range(z,15, 30, float(row['15-29']), portion_of_men)
+            generate_age_pyramid_for_range(z,30, 60, float(row['30-59']), portion_of_men)
+            generate_age_pyramid_for_range(z,60, 101, float(row['60-100']), portion_of_men)
             total += float(row['0-14']) + float(row['15-29']) + float(row['30-59']) + float(row['60-100'])
             zones[z_id] = z
     return {'zones':zones,
             'total': total
             }
 
-def get_piramid_by_zone(zones, density):
+def get_pyramid_by_zone(zones, density):
     total = 0
     for key in zones:
         for age in range(0,101):
@@ -107,37 +110,37 @@ def get_piramid_by_zone(zones, density):
 
 
 
-def init_zones_piramid():
+def init_zones_pyramid():
     data = read_zones_age_range()
     total_pixels = data['total']
     pixel_population_density = TOTAL_POPULATION_OF_PENALOLEN / total_pixels
-    get_piramid_by_zone(data['zones'], pixel_population_density)
+    get_pyramid_by_zone(data['zones'], pixel_population_density)
     return data['zones']
 
 
-# ------------------------------- SECTION rread and generate age piramid:
+# ------------------------------- SECTION rread and generate age pyramid:
 
-def init_age_piramid(year):
-    global age_piramid
+def init_penalolen_age_pyramid(year):
+    global penalolen_age_pyramid
     global TOTAL_POPULATION_OF_PENALOLEN
 
-    with open('data/2015_piramid.csv', 'rU') as f:
+    with open('data/2015_pyramid.csv', 'rU') as f:
         reader = csv.DictReader(f)
         for row in reader:
             range_min = int(row['range_min'])
             range_max = int(row['range_max'])
             diff = range_max - range_min + 1; # the plus one is because we count the first elem
             for age in range(range_min, range_max + 1):
-                age_piramid['men'][age] = int(row['men']) / diff
-                age_piramid['women'][age] = int(row['women']) / diff
-    TOTAL_POPULATION_OF_PENALOLEN = calculate_total_population(age_piramid)
-    age_piramid = make_piramid_older(age_piramid,INITIAL_YEAR, year)
+                penalolen_age_pyramid['men'][age] = int(row['men']) / diff
+                penalolen_age_pyramid['women'][age] = int(row['women']) / diff
+    TOTAL_POPULATION_OF_PENALOLEN = calculate_total_population(penalolen_age_pyramid)
+    penalolen_age_pyramid = make_pyramid_older(penalolen_age_pyramid,AGE_PIRAMID_YEAR, year)
 
 
-def calculate_total_population(piramid):
+def calculate_total_population(pyramid):
     total = 0
-    males = piramid['men']
-    females = piramid['women']
+    males = pyramid['men']
+    females = pyramid['women']
     for key in males:
         total += males[key]
     for key in females:
@@ -145,50 +148,57 @@ def calculate_total_population(piramid):
     return total
 
 
-def survived_year(gender, age, piramid):
+def survived_year(gender, age, pyramid):
     mortality = death_rates[gender][age]
     survival_rate = (1000 - float(mortality)) / 1000
-    return piramid[gender][age] * survival_rate
+    return pyramid[gender][age] * survival_rate
 
 
-def get_new_born(year, piramid):
+def get_new_born(year, pyramid):
     new_borns = 0
     for age in range(15, 50):
-        new_borns += fertility_rates[str(year)][age] * piramid['women'][age]
+        new_borns += fertility_rates[str(year)][age] * pyramid['women'][age]
     return new_borns
 
 
-def make_piramid_older(piramid, init_year, end_year):
+def make_pyramid_older(pyramid, init_year, end_year):
     for year in range(init_year, end_year):
         temp = {'men': {},
                 'women': {}}
         for age in range(0,100):
-            temp['men'][age + 1] = survived_year('men', age, piramid)
-            temp['women'][age + 1] = survived_year('women', age, piramid)
-        newborns = get_new_born(year, piramid)
+            temp['men'][age + 1] = survived_year('men', age, pyramid)
+            temp['women'][age + 1] = survived_year('women', age, pyramid)
+        newborns = get_new_born(year, pyramid)
         temp['men'][0] = newborns / 2
         temp['women'][0] = newborns / 2
-        piramid = temp
-    return piramid
+        pyramid = temp
+    return pyramid
 
 
-def init_age_piramid_to(year):
+def init_age_pyramid_to(year):
     init_masculinity_by_zone()
-    init_age_piramid(year)
+    init_age_pyramid(year)
 
 
 
-def print_age_piramid():
-    print_gender_age_piramid('men')
-    print_gender_age_piramid('women')
+def print_age_pyramid():
+    print_gender_age_pyramid('men')
+    print_gender_age_pyramid('women')
 
 
-def print_gender_age_piramid(gender):
+def print_gender_age_pyramid(gender):
     star_equivalent = 25
     print gender
     for age in range(0,101):
-        stars_to_print = age_piramid[gender][age] / star_equivalent
+        stars_to_print = age_pyramid[gender][age] / star_equivalent
         stars = str(age) + ': '
         for i in range(0, int(stars_to_print)):
             stars += '*'
-        print stars + '(' + str(age_piramid[gender][age]) + ')'
+        print stars + '(' + str(age_pyramid[gender][age]) + ')'
+
+#--------------------------SETUP-------------------------------
+
+init_masculinity_by_zone()
+init_fertility_rates()
+init_death_rates()
+init_penalolen_age_pyramid(INITIAL_YEAR - 1)
