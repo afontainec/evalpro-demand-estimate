@@ -1,5 +1,5 @@
 import Zones
-import Population
+import PopulationGenerator
 import Scenarios
 import Printer
 import os
@@ -20,15 +20,15 @@ total_populations = {}
 for zone in Zones.get():
     print 'getting age pyramids of', zone
     total_populations[zone] = []
-    pyramid = Population.zones_pyramids[str(zone)]
+    pyramid = PopulationGenerator.zones_pyramids[str(zone)]
     for year in YEARS:
         directory = './Population/zone_'+ str(zone)
         check_directory_exists(directory)
-        pyramid = Population.make_pyramid_older(pyramid, year - 1, year)
+        pyramid = PopulationGenerator.make_pyramid_older(pyramid, year - 1, year)
         path = './Population/zone_'+ str(zone) + '/raw/pyramid_year_' + str(year) + '.csv'
         Printer.pyramid_to_file(pyramid, path)
         Printer.pyramid_to_image(pyramid, './Population/zone_'+ str(zone) + '/image/pyramid_year_' + str(year) + '.png')
-        total_populations[zone].append(Population.calculate_total_population(pyramid))
+        total_populations[zone].append(PopulationGenerator.calculate_total_population(pyramid))
     Printer.print_total_population(total_populations[zone], './Population/zone_' + str(zone) + '/raw/total.csv')
     Printer.line_graph(YEARS, total_populations[zone], './Population/zone_' + str(zone) + '/image/total.png')
 
