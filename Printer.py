@@ -20,12 +20,26 @@ def age_to_array(obj):
 def print_total_population(obj, path):
     f = open(path, 'w')
     line = 'year,total\n'
+    f.write(line)
     i = INITIAL_YEAR
     for value in obj:
         line = str(i) + ',' + str(value)
         f.write(line)
         f.write('\n')
         i += 1
+
+def served_market(zones, total, porcentage, path):
+    f = open(path, 'w')
+    line = 'zone,total,porcentage\n'
+    f.write(line)
+    for zone in zones:
+        z = str(zone)
+        line = z + ',' + str(total[z]) + ',' + str(porcentage[z])
+        f.write(line)
+        f.write('\n')
+
+
+
 
 
 

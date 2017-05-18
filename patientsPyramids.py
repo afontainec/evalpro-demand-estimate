@@ -19,7 +19,9 @@ def translate_gender(gender):
     return
 
 pyramids = {}
+served = {}
 for zone in Zones.get():
+    served[str(zone)] = 0
     pyramids[str(zone)] = {
         'men': {},
         'women': {}
@@ -38,13 +40,28 @@ with open('data/patients.csv', 'rU') as f:
         age = int(row['edad_lr'])
 
         if  gender != None and age in AGE_RANGE and int(zone_id) in Zones.get():
+            served[zone_id] = served[zone_id] + 1
             pyramids[zone_id][gender][age] = pyramids[zone_id][gender][age] + 1
         else:
             #FIXME SEE WHAT TO DO WITH ENTRIES WITH MISSING INFO
+            x = 'yes'
 
-print "NO FUERON", not_
+porcentage = {}
 
 for zone in Zones.get():
+    print zone
+    # Print the pyramid of the zone
     path = './patients/raw/pyramid_zone_' + str(zone) + '.csv'
     Printer.pyramid_to_file(pyramids[str(zone)], path)
     Printer.pyramid_to_image(pyramids[str(zone)], './patients/image/pyramid_zone_' + str(zone) + '.png')
+    # calculate the serve market of the population
+    with open('population/zone_' + str(zone) + '/raw/total.csv', 'rU') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row['year'] == str(INITIAL_YEAR):
+                if float(row['total']) > 0:
+                    porcentage[str(zone)] =  served[str(zone)] / float(row['total']) * 100
+                else:
+                    porcentage[str(zone)] = 0
+path = './patients/raw/total.csv'
+Printer.served_market(Zones.get(), served, porcentage, path)

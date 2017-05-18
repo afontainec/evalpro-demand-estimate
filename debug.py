@@ -1,12 +1,17 @@
-import matplotlib.pyplot as plt
+import Zones
+import PopulationGenerator
+import Scenarios
+import Printer
+import csv
+import os
+from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, AGE_RANGE
 
-y = range(20)
-x1 = range(20)
-x2 = range(0, 200, 10)
+for z in Zones.get():
+    for year in YEARS:
+        content = 'year,total\n'
+        with open('./population/zone_' + str(z) + '/raw/pyramid_year_' + str(year) +'.csv', 'rU') as f:
+            for l in f:
+                content += l
+        ff = open('./population/zone_' + str(z) + '/raw/pyramid_year_' + str(year) +'.csv', 'w')
 
-fig, axes = plt.subplots(ncols=2, sharey=True)
-axes[0].barh(y, x1, align='center', color='red')
-axes[1].barh(y, x2, align='center', color='blue')
-axes[0].invert_xaxis()
-plt.savefig('foo.png')
-plt.close(fig)
+        ff.write(content)
