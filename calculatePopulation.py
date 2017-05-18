@@ -2,23 +2,69 @@ import Zones
 import Population
 import Scenarios
 import Printer
+import os
 from Global import INITIAL_YEAR, FINAL_YEAR, YEARS
 
 
 
-total_populations = []
-print 'Calculating age pyramid for penalolen...'
-pyramid = Population.penalolen_age_pyramid
-for year in YEARS:
-    print 'getting age pyramid of', year
-    pyramid = Population.make_pyramid_older(pyramid, year - 1, year)
-    path = './Population/penalolen/raw/pyramid_year_' + str(year) + '.csv'
-    Printer.pyramid_to_file(pyramid, path)
-    Printer.pyramid_to_image(pyramid, './Population/penalolen/image/pyramid_year_' + str(year) + '.png')
-    total_populations.append(Population.calculate_total_population(pyramid))
-    print 'age pyramid for year ', year, 'saved'
 
-Printer.line_graph(YEARS, total_populations, './Population/penalolen/image/total.png')
+def check_directory_exists(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    if not os.path.exists(directory +'/raw'):
+        os.makedirs(directory +'/raw')
+    if not os.path.exists(directory +'/image'):
+        os.makedirs(directory +'/image')
+
+total_populations = {}
+for zone in Zones.get():
+    print 'getting age pyramids of', zone
+    total_populations[zone] = []
+    pyramid = Population.zones_pyramids[str(zone)]
+    for year in YEARS:
+        directory = './Population/zone_'+ str(zone)
+        check_directory_exists(directory)
+        pyramid = Population.make_pyramid_older(pyramid, year - 1, year)
+        path = './Population/zone_'+ str(zone) + '/raw/pyramid_year_' + str(year) + '.csv'
+        Printer.pyramid_to_file(pyramid, path)
+        Printer.pyramid_to_image(pyramid, './Population/zone_'+ str(zone) + '/image/pyramid_year_' + str(year) + '.png')
+        total_populations[zone].append(Population.calculate_total_population(pyramid))
+    Printer.print_total_population(total_populations[zone], './Population/zone_' + str(zone) + '/raw/total.csv')
+    Printer.line_graph(YEARS, total_populations[zone], './Population/zone_' + str(zone) + '/image/total.png')
+
+penalolen_population = []
+for i in range(0,len(total_populations[1])):
+    total = 0
+    for zone in Zones.get():
+        total += total_populations[zone][i]
+    penalolen_population.append(total)
+print str(zone)
+Printer.print_total_population(penalolen_population, './Population/penalolen/raw/total_from_zones.csv')
+Printer.line_graph(YEARS, penalolen_population, './Population/penalolen/image/total_from_zones.png')
+
+
+#     print './Population/', zone
+#     for year in YEARS:
+#         print 'getting age pyramid of', year
+#         pyramid = Population.make_pyramid_older(pyramid, year - 1, year)
+#         path = './Population/penalolen/raw/pyramid_year_' + str(year) + '.csv'
+#         Printer.pyramid_to_file(pyramid, path)
+#         Printer.pyramid_to_image(pyramid, './Population/penalolen/image/pyramid_year_' + str(year) + '.png')
+#         total_populations.append(Population.calculate_total_population(pyramid))
+#         print 'age pyramid for year ', year, 'saved'
+# print 'Calculating age pyramid for penalolen...'
+# pyramid = Population.penalolen_age_pyramid
+# for year in YEARS:
+#     print 'getting age pyramid of', year
+#     pyramid = Population.make_pyramid_older(pyramid, year - 1, year)
+#     path = './Population/penalolen/raw/pyramid_year_' + str(year) + '.csv'
+#     Printer.pyramid_to_file(pyramid, path)
+#     Printer.pyramid_to_image(pyramid, './Population/penalolen/image/pyramid_year_' + str(year) + '.png')
+#     total_populations.append(Population.calculate_total_population(pyramid))
+#     print 'age pyramid for year ', year, 'saved'
+#
+# Printer.print_total_population(total_populations, './Population/penalolen/raw/total.csv')
+# Printer.line_graph(YEARS, total_populations, './Population/penalolen/image/total.png')
 
 
 # global zones

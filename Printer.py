@@ -10,11 +10,24 @@ def pyramid_to_file(obj, path):
         line = str(age) + "," + str(obj['men'][age]) + "," + str(obj['women'][age])  + "," + str((obj['men'][age] + obj['women'][age]))
         f.write(line)
         f.write('\n')
+
 def age_to_array(obj):
     array = []
     for age in AGE_RANGE:
         array.append(obj[age])
     return array
+
+def print_total_population(obj, path):
+    f = open(path, 'w')
+    line = 'year,total\n'
+    i = INITIAL_YEAR
+    for value in obj:
+        line = str(i) + ',' + str(value)
+        f.write(line)
+        f.write('\n')
+        i += 1
+
+
 
 
 def pyramid_to_image(obj, path):

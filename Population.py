@@ -10,6 +10,8 @@ penalolen_age_pyramid = { 'men': {},
                         'women': {},
                         }
 
+zones_pyramids = {}
+
 TOTAL_POPULATION_OF_PENALOLEN = 0;
 
 masculinity_rates = {}
@@ -63,8 +65,8 @@ def ponderate_population(age, gender, age_range, total, portion_of_gender):
     amount_of_gender = portion_of_gender * total
     count = 0
     for i in age_range:
-        count += age_pyramid[gender][i]
-    count_of_age = age_pyramid[gender][age]
+        count += penalolen_age_pyramid[gender][i]
+    count_of_age = penalolen_age_pyramid[gender][age]
     portion_of_age = count_of_age / count
     return amount_of_gender * portion_of_age
 
@@ -111,11 +113,12 @@ def get_pyramid_by_zone(zones, density):
 
 
 def init_zones_pyramid():
+    global zones_pyramids
     data = read_zones_age_range()
     total_pixels = data['total']
     pixel_population_density = TOTAL_POPULATION_OF_PENALOLEN / total_pixels
     get_pyramid_by_zone(data['zones'], pixel_population_density)
-    return data['zones']
+    zones_pyramids =  data['zones']
 
 
 # ------------------------------- SECTION rread and generate age pyramid:
@@ -196,9 +199,12 @@ def print_gender_age_pyramid(gender):
             stars += '*'
         print stars + '(' + str(age_pyramid[gender][age]) + ')'
 
+
+
 #--------------------------SETUP-------------------------------
 
 init_masculinity_by_zone()
 init_fertility_rates()
 init_death_rates()
 init_penalolen_age_pyramid(INITIAL_YEAR - 1)
+init_zones_pyramid()
