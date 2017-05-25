@@ -184,22 +184,6 @@ def init_age_pyramid_to(year):
 
 
 
-def print_age_pyramid():
-    print_gender_age_pyramid('men')
-    print_gender_age_pyramid('women')
-
-
-def print_gender_age_pyramid(gender):
-    star_equivalent = 25
-    print gender
-    for age in range(0,101):
-        stars_to_print = age_pyramid[gender][age] / star_equivalent
-        stars = str(age) + ': '
-        for i in range(0, int(stars_to_print)):
-            stars += '*'
-        print stars + '(' + str(age_pyramid[gender][age]) + ')'
-
-
 
 #--------------------------SETUP-------------------------------
 

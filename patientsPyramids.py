@@ -7,6 +7,18 @@ import os
 from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, AGE_RANGE
 
 
+def get_current_pyramid(zone):
+    pyramid = {
+               'men': {},
+               'women'; {}
+               }
+    with open('patients/raw/pyramid_zone_' + str(zone) + '.csv', 'rU') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            pyramid['men'][int(row['age'])] = int(row['men'])
+            pyramid['women'][int(row['age'])] = int(row['women'])
+
+
 def check_attr_exists_in_dictionary(attr, dictionary):
     if not attr in dictionary:
         dictionary[attr] = {}
