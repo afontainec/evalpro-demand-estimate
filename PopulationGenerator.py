@@ -94,9 +94,9 @@ def read_zones_age_range():
             portion_of_women = 1 - portion_of_men
             generate_age_pyramid_for_range(z,0, 15, float(row['0-14']), portion_of_men)
             generate_age_pyramid_for_range(z,15, 30, float(row['15-29']), portion_of_men)
-            generate_age_pyramid_for_range(z,30, 60, float(row['30-59']), portion_of_men)
-            generate_age_pyramid_for_range(z,60, 101, float(row['60-100']), portion_of_men)
-            total += float(row['0-14']) + float(row['15-29']) + float(row['30-59']) + float(row['60-100'])
+            generate_age_pyramid_for_range(z,30, 65, float(row['30-64']), portion_of_men)
+            generate_age_pyramid_for_range(z,65, 101, float(row['65-100']), portion_of_men)
+            total += float(row['0-14']) + float(row['15-29']) + float(row['30-64']) + float(row['65-100'])
             zones[z_id] = z
     return {'zones':zones,
             'total': total
