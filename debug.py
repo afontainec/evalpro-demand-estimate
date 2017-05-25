@@ -1,17 +1,26 @@
-import Zones
-import PopulationGenerator
-import Scenarios
-import Printer
-import csv
-import os
-from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, AGE_RANGE
+import matplotlib.pyplot as plt
+import numpy as np
+n = 50
+x = np.random.randn(n)
+# y = x * np.random.randn(n)
+y = 1 + 2 * x
 
-for z in Zones.get():
-    for year in YEARS:
-        content = 'year,total\n'
-        with open('./population/zone_' + str(z) + '/raw/pyramid_year_' + str(year) +'.csv', 'rU') as f:
-            for l in f:
-                content += l
-        ff = open('./population/zone_' + str(z) + '/raw/pyramid_year_' + str(year) +'.csv', 'w')
+# fig, ax = plt.subplots()
+# fit = np.polyfit(x, y, deg=1)
+# ax.plot(x, fit[0] * x + fit[1], color='red')
+# ax.scatter(x, y)
 
-        ff.write(content)
+# fig.show()
+
+
+plt.plot(x, y, 'bo')
+fit = np.polyfit(x, y, deg=1)
+
+plt.plot(x, fit[0] * x + fit[1], color='red')
+fit2 = np.polyfit(x, y, deg=2)
+plt.plot(x,fit2[2] + fit2[1] * x + fit2[0] * x * x, color='green')
+
+
+
+
+plt.show()

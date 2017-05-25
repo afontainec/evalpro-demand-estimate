@@ -116,6 +116,7 @@ for year in range(CURRENT_YEAR, END_YEAR):
                     print 'should not print this'
                     print total, base_case_total
                     0/0 # Drop script
+                ## FIXME the porcentage that used to go to private pharmacies should be over new_clients - used_to_go_to_comunal_pharmacy
                 used_to_go_to_private_pharmacy = PORCENTAGE_PRIVATE_PHARMACY * new_clients
                 did_not_buy_medicine = (1 - PORCENTAGE_PRIVATE_PHARMACY) * new_clients
                 used_to_go_to_comunal_pharmacy = get_used_to_go_to_comunal_pharmacy(year,zone_id,age,gender,SCENARIO, new_clients)

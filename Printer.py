@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, AGE_RANGE
 
 
@@ -41,9 +42,6 @@ def served_market(zones, total, porcentage, path):
 
 
 
-
-
-
 def pyramid_to_image(obj, path):
     y = AGE_RANGE
     x1 = age_to_array(obj['men'])
@@ -57,8 +55,15 @@ def pyramid_to_image(obj, path):
     plt.close(fig)
 
 
-def line_graph(xAxis, yAxis, path):
-    plt.plot(xAxis, yAxis, 'ro')
-    # plt.axis([0, 6, 0, 20])
+def line_graph(xAxis, yAxis, path, tendency=False):
+    plt.plot(xAxis, yAxis, 'bo')
+    if(tendency):
+        fit = np.polyfit(xAxis, yAxis, deg=1)
+        fit2 = np.polyfit(xAxis, yAxis, deg=2)
+        xSorted = sorted(xAxis)
+        y = map(lambda x: fit[0] * x + fit[1], xSorted)
+        plt.plot(xSorted, y, color='red')
+        y2 = map(lambda x: fit2[2] + fit2[1] * x + fit2[0] * x * x, xSorted)
+        plt.plot(xSorted, y2, color='green')
     plt.savefig(path)
     plt.close()
