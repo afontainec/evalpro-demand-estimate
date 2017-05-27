@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, AGE_RANGE
+from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, AGE_RANGE, GENDER, INTERVALS, INTERVALS_LABELS
+import Zones
+
 
 
 def pyramid_to_file(obj, path):
@@ -67,3 +69,36 @@ def line_graph(xAxis, yAxis, path, tendency=False):
         plt.plot(xSorted, y2, color='green')
     plt.savefig(path)
     plt.close()
+
+
+def demand_by_zone(obj, path):
+    f = open(path, 'w')
+    line = 'unidad'
+    for year in YEARS:
+        line += ',' + str(year)
+    line += '\n'
+    f.write(line)
+
+    for zone in Zones.get():
+        line = str(zone)
+        for year in YEARS:
+            line += ',' + str(obj[year][zone])
+        line += '\n'
+        f.write(line)
+
+
+def demand_by_segment(obj, path):
+    f = open(path, 'w')
+    line = 'segmento'
+    for year in YEARS:
+        line += ',' + str(year)
+    line += '\n'
+    f.write(line)
+
+    for gender in GENDER:
+        for label in INTERVALS_LABELS:
+            line = str(gender) + '_' + label
+            for year in YEARS:
+                line += ',' + str(obj[year][gender][label])
+            line += '\n'
+            f.write(line)

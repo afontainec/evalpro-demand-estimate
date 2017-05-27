@@ -1,5 +1,5 @@
 import csv
-from Global import INITIAL_YEAR, FINAL_YEAR
+from Global import INITIAL_YEAR, FINAL_YEAR, MAX_AGE
 
 death_rates = { 'men': {},
                 'women': {},
@@ -105,7 +105,7 @@ def read_zones_age_range():
 def get_pyramid_by_zone(zones, density):
     total = 0
     for key in zones:
-        for age in range(0,101):
+        for age in range(0,MAX_AGE + 1):
             zones[key]['men'][age] = zones[key]['men'][age] * density
             zones[key]['women'][age] = zones[key]['women'][age] * density
             total += zones[key]['men'][age] + zones[key]['women'][age]
@@ -168,7 +168,7 @@ def make_pyramid_older(pyramid, init_year, end_year):
     for year in range(init_year, end_year):
         temp = {'men': {},
                 'women': {}}
-        for age in range(0,100):
+        for age in range(0,MAX_AGE):
             temp['men'][age + 1] = survived_year('men', age, pyramid)
             temp['women'][age + 1] = survived_year('women', age, pyramid)
         newborns = get_new_born(year, pyramid)

@@ -7,6 +7,10 @@ YEARS = range(INITIAL_YEAR, FINAL_YEAR)
 
 INTERVALS_LABELS = ['0-14', '15-29', '30-64', '65-100']
 
+INTERVALS = [range(0,15), range(15,30), range(30,65), range(65,MAX_AGE)]
+
+GENDER = ['men', 'women']
+
 ESCENARIO = 1
 
 NO_SENSIBILITY = 'NO_SENSIBILITY'
