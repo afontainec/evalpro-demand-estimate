@@ -42,6 +42,31 @@ print str(zone)
 Printer.print_total_population(penalolen_population, './Population/penalolen/raw/total_from_zones.csv')
 Printer.line_graph(YEARS, penalolen_population, './Population/penalolen/image/total_from_zones.png')
 
+pyramid = {}
+for year in YEARS:
+    pyramid[year] = {
+        'men': {},
+        'women': {},
+    }
+    for age in AGE_RANGE:
+        pyramid[year]['men'][age] = 0
+        pyramid[year]['women'][age] = 0
+
+    print year
+    for zone in Zones.get():
+        path = 'population/zone_' + str(zone) + '/raw/pyramid_year_' + str(year) + '.csv'
+        with open(path, 'rU') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                age = int(row['age'])
+                men = float(row['men'])
+                women = float(row['women'])
+                pyramid[year]['men'][age] += men
+                pyramid[year]['women'][age] += women
+    Printer.pyramid_to_image(pyramid[year], './Population/penalolen/image/pyramid_year_' + str(year) + '.png')
+    path = './Population/penalolen/raw/pyramid_year_' + str(year) + '.csv'
+    Printer.pyramid_to_file(pyramid[year], path)
+
 
 #     print './Population/', zone
 #     for year in YEARS:

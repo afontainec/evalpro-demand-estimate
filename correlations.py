@@ -33,6 +33,12 @@ with open('data/travel_time.csv', 'rU') as f:
         private_travel[row['Unidad Vecinal']] = row['Private']
         actual_travel[row['Unidad Vecinal']] = row['Actual']
 
+walking_time = {}
+with open('data/walking_time.csv', 'rU') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        walking_time[row['Unidad Vecinal']] = row['Actual']
+
 quintiles = {}
 
 with open('data/quintiles.csv', 'rU') as f:
@@ -65,7 +71,20 @@ for gender in ['men', 'women']:
         Printer.line_graph(x_axis_private, y_axis, './correlations/time_to_private_pharmacy/'+ gender + '_' + label + '.png', False)
         Printer.line_graph(x_axis_actual, y_axis, './correlations/time_to_actual_pharmacy/'+ gender + '_' + label + '.png', False)
 
-
+print 'Time (walking) correlations...'
+for gender in ['men', 'women']:
+    for label in INTERVALS_LABELS:
+        y_axis = []
+        for zone in Zones.get():
+            if( zone < 41):
+                y_axis.append(going_proportion[zone][gender][label])
+        x_axis = []
+        for zone in Zones.get():
+            z = str(zone)
+            if( zone < 41):
+                x_axis.append(float(walking_time[z]))
+        Printer.line_graph(x_axis, y_axis, './correlations/walking_time/'+ gender + '_' + label + '_tendency' + '.png', True)
+        Printer.line_graph(x_axis, y_axis, './correlations/walking_time/'+ gender + '_' + label + '.png', False)
 
 ## GET QUINTILE CORRELATIONS
 print 'Quintile correlations...'

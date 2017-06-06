@@ -1,5 +1,5 @@
 import csv
-from Global import AGE_RANGE
+from Global import AGE_RANGE, INTERVALS, INTERVALS_LABELS, GENDER
 
 
 def get_pyramid(zone, year):
@@ -31,30 +31,15 @@ def get_patient_pyramid(zone):
 
 
 def shorten_pyramid(pyramid):
-    shorten_pyramid = {
-            'men': {
-                '0-14': 0,
-                '15-29': 0,
-                '30-64': 0,
-                '65-100': 0,
-            },
-            'women': {
-                '0-14': 0,
-                '15-29': 0,
-                '30-64': 0,
-                '65-100': 0,
-            }
-    }
-    for age in range(0,15):
-        shorten_pyramid['men']['0-14'] += float(pyramid['men'][age])
-        shorten_pyramid['women']['0-14'] += float(pyramid['women'][age])
-    for age in range(15,30):
-        shorten_pyramid['men']['15-29'] += float(pyramid['men'][age])
-        shorten_pyramid['women']['15-29'] += float(pyramid['women'][age])
-    for age in range(30,65):
-        shorten_pyramid['men']['30-64'] += float(pyramid['men'][age])
-        shorten_pyramid['women']['30-64'] += float(pyramid['women'][age])
-    for age in range(65,100):
-        shorten_pyramid['men']['65-100'] += float(pyramid['men'][age])
-        shorten_pyramid['women']['65-100'] += float(pyramid['women'][age])
+    shorten_pyramid = {}
+    for gender in GENDER:
+        shorten_pyramid[gender] = {}
+        for label in INTERVALS_LABELS:
+            shorten_pyramid[gender][label] = 0
+
+    for index, interval in enumerate(INTERVALS):
+        label = INTERVALS_LABELS[index]
+        for age in interval:
+            for gender in GENDER:
+                shorten_pyramid[gender][label] += float(pyramid['men'][age])
     return shorten_pyramid

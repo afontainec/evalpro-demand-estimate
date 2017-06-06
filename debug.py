@@ -1,26 +1,13 @@
-import matplotlib.pyplot as plt
-import numpy as np
-n = 50
-x = np.random.randn(n)
-# y = x * np.random.randn(n)
-y = 1 + 2 * x
-
-# fig, ax = plt.subplots()
-# fit = np.polyfit(x, y, deg=1)
-# ax.plot(x, fit[0] * x + fit[1], color='red')
-# ax.scatter(x, y)
-
-# fig.show()
+import Zones
+import Printer
+import csv
+from Global import INITIAL_YEAR, FINAL_YEAR, YEARS, GENDER, AGE_RANGE, INTERVALS_LABELS, INTERVALS
 
 
-plt.plot(x, y, 'bo')
-fit = np.polyfit(x, y, deg=1)
-
-plt.plot(x, fit[0] * x + fit[1], color='red')
-fit2 = np.polyfit(x, y, deg=2)
-plt.plot(x,fit2[2] + fit2[1] * x + fit2[0] * x * x, color='green')
+cycle_time = 17
 
 
+total_time = 249 * (8 - 0.75 * 2) * 60
 
 
-plt.show()
+throughput = total_time/ cycle_time
